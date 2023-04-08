@@ -21,6 +21,7 @@ async function run() {
         await client.connect();
         const database = client.db('appointlet');
         const appointmentsCollection = database.collection('appointments');
+        const usersCollection = database.collection('users');
 
         app.get('/appointments', async (req, res)=>{
           const email = req.query.email;
@@ -33,7 +34,7 @@ async function run() {
           const appointments = await cursor.toArray();
           res.json(appointments);
         })
-
+        //appointments
         app.post('/appointments', async (req, res) => {
           const appointment = req.body;
           const result = await appointmentsCollection.insertOne(appointment);
@@ -41,6 +42,47 @@ async function run() {
           // res.json({message: 'hello app'})
           res.json(result)
         });
+
+        //users
+        app.post('/users', async (req, res) => {
+          const user = req.body;
+          const result = await usersCollection.insertOne(user);
+          console.log(result);
+          res.json(result)
+        });
+
+        
+        //upsert google users
+        app.put('/users', async(req,res) =>{
+          const user = req.body;
+          const filter = {email: user.email};
+          const options = {upsert: true};
+          const updateDoc = {$set: user};
+          const result = await usersCollection.updateOne(filter, updateDoc, options);
+          res.json(result);
+        });
+
+        //admin role
+        app.put('/users/admin', async (req,res) => {
+          const user = req.body;
+          console.log('put', user);
+          const filter = {email: user.email};
+          const updateDoc = {$set: {role: 'admin'}};
+          const result = await usersCollection.updateOne(filter, updateDoc);
+          res.json(result);
+        })
+
+        //admin dashboard
+        app.get('/users/:email', async(req, res) => {
+          const email = req.params.email;
+          const query = {email: email};
+          const user = await usersCollection.findOne(query);
+          let isAdmin = false;
+          if(user?.role === 'admin'){
+            isAdmin = true;
+          }
+          res.json({admin: isAdmin});
+        })
 
 
     }
@@ -52,7 +94,7 @@ async function run() {
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
-  res.send('Hello Appointlet!');
+  res.send('Appointlet is running!');
 });
 
 app.listen(port, () => {
