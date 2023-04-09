@@ -1,5 +1,4 @@
 node_modules
 .env
 appointlet-firebase-adminsdk.json
-.vercel
 

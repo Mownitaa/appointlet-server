@@ -7,6 +7,10 @@ require('dotenv').config();
 const {MongoClient} = require('mongodb');
 const port = process.env.PORT || 5000;
 
+
+app.use(cors());
+app.use(express.json());
+
 const serviceAccount= JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 // const serviceAccount= require('./appointlet-firebase-adminsdk.json');
 
@@ -14,8 +18,6 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
-app.use(cors());
-app.use(express.json());
 ///
 // app.use(express.static('public'))
 ///
