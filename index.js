@@ -8,16 +8,16 @@ const {MongoClient} = require('mongodb');
 const port = process.env.PORT || 5000;
 
 const serviceAccount= JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+// const serviceAccount= require('./appointlet-firebase-adminsdk.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
-
 app.use(cors());
 app.use(express.json());
 ///
-app.use(express.static('public'))
+// app.use(express.static('public'))
 ///
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.6w1pi.mongodb.net/?retryWrites=true&w=majority`;
@@ -52,7 +52,6 @@ async function run() {
           const email = req.query.email;
           const date = new Date(req.query.date).toLocaleDateString();
           // const date = req.query.date.toString();
-          console.log("hello", date);
           const query = {email: email, date: date}
           console.log(query);
           const cursor = appointmentsCollection.find(query);
